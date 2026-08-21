@@ -1,0 +1,76 @@
+{
+    "name": "arzcode/filament-head",
+    "description": "Edit laravel/head metadata (title, description, Open Graph, canonical, robots) per Eloquent record from a Filament panel.",
+    "keywords": [
+        "laravel",
+        "filament",
+        "head",
+        "seo",
+        "metadata",
+        "open-graph"
+    ],
+    "homepage": "https://github.com/buzkall/filament-head",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Arzcode",
+            "email": "git@arzcode.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "filament/filament": "^5.0",
+        "illuminate/contracts": "^13.17",
+        "laravel/head": "^0.2",
+        "spatie/laravel-package-tools": "^1.92"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.30",
+        "orchestra/testbench": "^11.0",
+        "pestphp/pest": "^4.0 || ^5.0",
+        "pestphp/pest-plugin-laravel": "^4.0 || ^5.0",
+        "pestphp/pest-plugin-livewire": "^4.0 || ^5.0",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Arzcode\\FilamentHead\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Arzcode\\FilamentHead\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "analyse": "vendor/bin/phpstan analyse",
+        "format": "vendor/bin/pint",
+        "format:test": "vendor/bin/pint --test"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Arzcode\\FilamentHead\\FilamentHeadServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "support": {
+        "issues": "https://github.com/buzkall/filament-head/issues",
+        "source": "https://github.com/buzkall/filament-head"
+    }
+}

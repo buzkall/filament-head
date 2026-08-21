@@ -28,6 +28,10 @@ return [
         'canonical_url' => 'La dirección bajo la que debe indexarse esta página.',
     ],
 
+    'exceptions' => [
+        'unknown_field' => 'No se pueden ocultar [:fields] de la sección de metadatos. Solo estos campos son opcionales: :allowed.',
+    ],
+
     'robots' => [
         'all' => 'Indexar y seguir enlaces (por defecto)',
         'noindex_follow' => 'No indexar, seguir enlaces',

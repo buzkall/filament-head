@@ -71,3 +71,21 @@ it('has no untranslated literal strings in src', function (): void {
 
     expect($offenders)->toBe([]);
 });
+
+it('has no untranslated exception messages in src', function (): void {
+    $offenders = [];
+
+    foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(__DIR__.'/../../src')) as $file) {
+        if ($file->getExtension() !== 'php') {
+            continue;
+        }
+
+        foreach (file($file->getPathname()) as $number => $line) {
+            if (preg_match('/throw new \w*Exception\(\s*[\'"]/', $line)) {
+                $offenders[] = $file->getFilename().':'.($number + 1).' — '.trim($line);
+            }
+        }
+    }
+
+    expect($offenders)->toBe([]);
+});

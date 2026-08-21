@@ -28,6 +28,10 @@ return [
         'canonical_url' => 'L\'adreça sota la qual s\'ha d\'indexar aquesta pàgina.',
     ],
 
+    'exceptions' => [
+        'unknown_field' => 'No es poden amagar [:fields] de la secció de metadades. Només aquests camps són opcionals: :allowed.',
+    ],
+
     'robots' => [
         'all' => 'Indexar i seguir enllaços (per defecte)',
         'noindex_follow' => 'No indexar, seguir enllaços',

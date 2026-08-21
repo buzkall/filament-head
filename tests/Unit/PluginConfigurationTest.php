@@ -2,6 +2,7 @@
 
 use Arzcode\FilamentHead\FilamentHeadPlugin;
 use Arzcode\FilamentHead\Schemas\HeadMetadataFields;
+use Filament\Facades\Filament;
 
 it('returns null for everything it was not given', function (): void {
     $plugin = FilamentHeadPlugin::make();
@@ -41,4 +42,16 @@ it('uses the application locale when nothing configures one', function (): void 
     app()->setLocale('eu');
 
     expect(HeadMetadataFields::make()->getLocales())->toBe(['eu']);
+});
+
+it('returns null from for() when the panel has no plugin', function (): void {
+    expect(FilamentHeadPlugin::for(Filament::getPanel('admin')))->toBeNull();
+});
+
+it('returns the plugin from for() when the panel registers one', function (): void {
+    $this->rebootWith(
+        configurePlugin: fn (FilamentHeadPlugin $plugin): FilamentHeadPlugin => $plugin->titleLimit(42),
+    );
+
+    expect(FilamentHeadPlugin::for(Filament::getPanel('admin'))?->getTitleLimit())->toBe(42);
 });

@@ -115,3 +115,14 @@ it('renders and applies cleanly when the section is left entirely empty', functi
     expect($post->headMetadata?->translated('title'))->toBeNull()
         ->and(renderHead($post))->toContain('<title>No metadata</title>');
 });
+
+it('refuses to hide a field that is not optional', function (string $field): void {
+    expect(fn () => HeadMetadataFields::make()->without([$field]))
+        ->toThrow(LogicException::class, $field);
+})->with(['title', 'description', 'og_titel']);
+
+it('accepts every documented optional field', function (): void {
+    $fields = HeadMetadataFields::make()->without(HeadMetadataFields::OPTIONAL_FIELDS);
+
+    expect($fields)->toBeInstanceOf(HeadMetadataFields::class);
+});

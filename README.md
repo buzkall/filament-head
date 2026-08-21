@@ -169,7 +169,8 @@ HeadMetadataFields::make()->without(['twitter_card', 'robots'])
 ```
 
 Any of `og_title`, `og_description`, `og_image`, `og_type`, `twitter_card`, `canonical_url`,
-`robots` can be hidden. Title and description always render.
+`robots` can be hidden. Title and description always render — passing either of them, or a name
+that is not a field, throws a `LogicException` rather than quietly dropping the input.
 
 ## Configuration
 

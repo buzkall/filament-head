@@ -28,6 +28,10 @@ return [
         'canonical_url' => 'The address this page should be indexed under.',
     ],
 
+    'exceptions' => [
+        'unknown_field' => 'Cannot hide [:fields] from the head metadata section. Only these fields are optional: :allowed.',
+    ],
+
     'robots' => [
         'all' => 'Index and follow links (default)',
         'noindex_follow' => 'Do not index, follow links',

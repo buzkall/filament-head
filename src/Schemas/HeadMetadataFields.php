@@ -15,6 +15,7 @@ use Filament\Schemas\Components\Tabs;
 use Illuminate\Contracts\Support\Htmlable;
 use Laravel\Head\Enums\OgType;
 use Laravel\Head\Enums\TwitterCard;
+use LogicException;
 
 /**
  * The whole editing UI, as a single section that drops into any resource form.
@@ -65,12 +66,24 @@ class HeadMetadataFields extends Section
     }
 
     /**
-     * Hide fields by column name. See OPTIONAL_FIELDS for what may be hidden.
+     * Hide fields by column name. Only OPTIONAL_FIELDS may be hidden: title and
+     * description are the point of the section, so hiding them is a typo, not a choice.
      *
      * @param  array<int, string>  $fields
+     *
+     * @throws LogicException when a name is not one of OPTIONAL_FIELDS
      */
     public function without(array $fields): static
     {
+        $unknown = array_diff($fields, static::OPTIONAL_FIELDS);
+
+        if ($unknown !== []) {
+            throw new LogicException(__('filament-head::filament-head.exceptions.unknown_field', [
+                'fields' => implode(', ', $unknown),
+                'allowed' => implode(', ', static::OPTIONAL_FIELDS),
+            ]));
+        }
+
         $this->hiddenFields = array_values($fields);
 
         return $this;

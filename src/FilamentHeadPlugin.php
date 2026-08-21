@@ -53,8 +53,15 @@ class FilamentHeadPlugin implements Plugin
         return $plugin;
     }
 
-    public static function for(Panel $panel): static
+    /**
+     * The plugin registered on a given panel, or null when that panel has none.
+     */
+    public static function for(Panel $panel): ?static
     {
+        if (! $panel->hasPlugin(static::ID)) {
+            return null;
+        }
+
         /** @var static $plugin */
         $plugin = $panel->getPlugin(static::ID);
 

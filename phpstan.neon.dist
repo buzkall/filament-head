@@ -1,0 +1,9 @@
+parameters:
+    level: 6
+    paths:
+        - src
+        # Fixtures only: they exercise the trait, which PHPStan cannot analyse on its own.
+        - tests/Fixtures
+    tmpDir: build/phpstan
+    checkOctaneCompatibility: true
+    checkModelProperties: true

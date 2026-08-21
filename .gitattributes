@@ -8,5 +8,5 @@
 /phpstan.neon.dist  export-ignore
 /phpunit.xml        export-ignore
 /pint.json          export-ignore
-/CHANGELOG.md                     export-ignore
-/filament-head-implementation.md  export-ignore
+/CHANGELOG.md       export-ignore
+/filament-head-implementation.md export-ignore

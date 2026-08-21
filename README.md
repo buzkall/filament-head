@@ -22,6 +22,11 @@ $post->applyHead();
 
 Translatable per locale, translated into English, Spanish and Catalan.
 
+| Default — one locale | With `locales` configured |
+|---|---|
+| <img src="art/section.png" alt="The SEO and sharing section open in a Filament resource form, showing title, meta description, Open Graph and robots fields" width="420"> | <img src="art/locale-tabs.png" alt="The same section with a tab per locale above the title and description fields" width="420"> |
+| A collapsible section at the foot of the form, with character counters on title and description. | One tab per locale for the four text fields; image, type, canonical and robots stay shared. |
+
 ---
 
 ## Requirements

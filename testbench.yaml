@@ -1,0 +1,27 @@
+providers:
+  - Arzcode\FilamentHead\FilamentHeadServiceProvider
+  - Workbench\App\Providers\AdminPanelProvider
+
+migrations:
+  - workbench/database/migrations
+
+seeders:
+  - Workbench\Database\Seeders\DatabaseSeeder
+
+env:
+  - APP_NAME="Filament Head"
+  - APP_KEY=base64:8dQfPh0kEqZ0mZ0cUqZ0mZ0cUqZ0mZ0cUqZ0mZ0cUqA=
+  - FILESYSTEM_DISK=public
+
+workbench:
+  start: '/login-as-admin'
+  install: true
+  discovers:
+    web: true
+  build:
+    - asset-publish
+    - create-sqlite-db
+    - db:wipe
+    - migrate:refresh
+  assets:
+    - laravel-assets

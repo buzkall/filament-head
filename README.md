@@ -1,9 +1,7 @@
 # Filament Head
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/arzcode/filament-head.svg?style=flat-square)](https://packagist.org/packages/arzcode/filament-head)
 [![Tests](https://img.shields.io/github/actions/workflow/status/buzkall/filament-head/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/buzkall/filament-head/actions/workflows/tests.yml)
 [![Quality](https://img.shields.io/github/actions/workflow/status/buzkall/filament-head/quality.yml?branch=main&label=quality&style=flat-square)](https://github.com/buzkall/filament-head/actions/workflows/quality.yml)
-[![Total Downloads](https://img.shields.io/packagist/dt/arzcode/filament-head.svg?style=flat-square)](https://packagist.org/packages/arzcode/filament-head)
 
 Edit the metadata that search engines and social networks read — title, meta description, Open
 Graph, canonical URL, robots — **per record, from a Filament panel**, and apply it on the public

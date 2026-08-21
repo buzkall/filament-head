@@ -1,6 +1,0 @@
-Screenshots referenced by the README live here:
-
-  section.png      the SEO & sharing section open in a resource form, single locale
-  locale-tabs.png  the same section with `locales` configured, showing the tabs
-
-This directory is export-ignored, so the images never ship in the Composer dist.

@@ -6,3 +6,4 @@ coverage
 vendor
 .php-cs-fixer.cache
 .phpunit.result.cache
+workbench/database/*.sqlite

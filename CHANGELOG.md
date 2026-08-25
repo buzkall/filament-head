@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `->withoutSection()` on `HeadMetadataFields`, rendering the bare fields for containers
   that already frame and label their contents — a tab, a wizard step, a fieldset.
 - `->heading()` to override the section heading.
+- The Open Graph title and description helpers now name the value they would reuse, quoting this
+  locale's title or meta description instead of only saying that one exists.
 
 ### Changed
 

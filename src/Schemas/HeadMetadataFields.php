@@ -12,6 +12,7 @@ use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Contracts\Support\Htmlable;
 use Laravel\Head\Enums\OgType;
 use Laravel\Head\Enums\TwitterCard;
@@ -202,11 +203,11 @@ class HeadMetadataFields extends Group
                 ->helperText(fn (?string $state): string => $this->counter($state, $this->getDescriptionLimit())),
             'og_title' => TextInput::make("og_title.{$locale}")
                 ->label(__('filament-head::filament-head.fields.og_title'))
-                ->helperText(__('filament-head::filament-head.helpers.og_title')),
+                ->helperText(fn (Get $get): string => $this->reuseHint('og_title', $get("title.{$locale}"))),
             'og_description' => Textarea::make("og_description.{$locale}")
                 ->label(__('filament-head::filament-head.fields.og_description'))
                 ->rows(2)
-                ->helperText(__('filament-head::filament-head.helpers.og_description')),
+                ->helperText(fn (Get $get): string => $this->reuseHint('og_description', $get("description.{$locale}"))),
             'canonical_url' => TextInput::make("canonical_url.{$locale}")
                 ->label(__('filament-head::filament-head.fields.canonical_url'))
                 ->helperText(__('filament-head::filament-head.helpers.canonical_url'))
@@ -259,6 +260,23 @@ class HeadMetadataFields extends Group
     protected function reject(array $fields): array
     {
         return array_values(array_diff_key($fields, array_flip($this->hiddenFields)));
+    }
+
+    /**
+     * "Leave blank to reuse the title", naming the value it would reuse when this
+     * locale's sibling field holds one. Only the sibling is quoted: the rest of the
+     * fallback chain — the model's headDefaults(), the app's Head::defaults() — is
+     * not in the form, so promising a value from it would be a guess.
+     */
+    protected function reuseHint(string $field, mixed $reused): string
+    {
+        if (blank($reused) || ! is_string($reused)) {
+            return __("filament-head::filament-head.helpers.{$field}");
+        }
+
+        return __("filament-head::filament-head.helpers.{$field}_reusing", [
+            'value' => str($reused)->squish()->limit(60)->toString(),
+        ]);
     }
 
     /**

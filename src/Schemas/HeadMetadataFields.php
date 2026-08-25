@@ -36,6 +36,15 @@ class HeadMetadataFields extends Section
         'robots',
     ];
 
+    /** Columns of head_metadata stored as JSON keyed by locale. */
+    public const TRANSLATABLE_FIELDS = [
+        'title',
+        'description',
+        'og_title',
+        'og_description',
+        'canonical_url',
+    ];
+
     /** @var array<int, string>|null */
     protected ?array $localeOverride = null;
 
@@ -170,6 +179,10 @@ class HeadMetadataFields extends Section
                 ->label(__('filament-head::filament-head.fields.og_description'))
                 ->rows(2)
                 ->helperText(__('filament-head::filament-head.helpers.og_description')),
+            'canonical_url' => TextInput::make("canonical_url.{$locale}")
+                ->label(__('filament-head::filament-head.fields.canonical_url'))
+                ->helperText(__('filament-head::filament-head.helpers.canonical_url'))
+                ->url(),
         ];
 
         return $this->reject($fields);
@@ -196,10 +209,6 @@ class HeadMetadataFields extends Section
             'twitter_card' => Select::make('twitter_card')
                 ->label(__('filament-head::filament-head.fields.twitter_card'))
                 ->options($this->enumOptions(TwitterCard::cases())),
-            'canonical_url' => TextInput::make('canonical_url')
-                ->label(__('filament-head::filament-head.fields.canonical_url'))
-                ->helperText(__('filament-head::filament-head.helpers.canonical_url'))
-                ->url(),
             'robots' => Select::make('robots')
                 ->label(__('filament-head::filament-head.fields.robots'))
                 ->options([

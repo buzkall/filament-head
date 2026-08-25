@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking.** `canonical_url` is now stored as JSON keyed by locale, like the other text
+  fields, and renders inside the locale tabs. On a site that serves each locale from its own
+  URL, one shared canonical pointed every locale at a single page and asked search engines to
+  drop the rest. Existing installs need the column migrated from `string` to `json`.
+- **Breaking.** Unlike every other translatable field, `canonical_url` does not fall back to
+  another locale: a blank one emits no canonical rather than borrowing a wrong address.
+  `HeadMetadata::translated()` takes a `$fallback` argument for this.
+
 ## [0.1.0]
 
 ### Added

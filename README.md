@@ -23,7 +23,7 @@ Translatable per locale, translated into English, Spanish and Catalan.
 | Default — one locale | With `locales` configured |
 |---|---|
 | <img src="art/section.png" alt="The SEO and sharing section open in a Filament resource form, showing title, meta description, Open Graph and robots fields" width="420"> | <img src="art/locale-tabs.png" alt="The same section with a tab per locale above the title and description fields" width="420"> |
-| A collapsible section at the foot of the form, with character counters on title and description. | One tab per locale for the four text fields; image, type, canonical and robots stay shared. |
+| A collapsible section at the foot of the form, with character counters on title and description. | One tab per locale for the five text fields; image, type, card and robots stay shared. |
 
 ---
 
@@ -144,8 +144,8 @@ default, and a field with neither is not emitted at all.
 
 ## Translations
 
-`title`, `description`, `og_title` and `og_description` are stored as JSON keyed by locale. The
-remaining fields — image, type, canonical, robots — are stored once.
+`title`, `description`, `og_title`, `og_description` and `canonical_url` are stored as JSON keyed
+by locale. The remaining fields — image, type, card, robots — are stored once.
 
 By default the form renders one untabbed set of fields for the application's current locale. List
 more than one locale and it renders a tab per locale:
@@ -162,6 +162,11 @@ HeadMetadataFields::make()->locales(['es', 'en'])
 
 At render time, `applyHead()` picks the value for the active locale, then the configured
 `fallback_locale` (defaulting to `app.fallback_locale`), then the first non-empty translation.
+
+**`canonical_url` is the exception: it never falls back.** On a site that serves each locale from
+its own URL, borrowing another locale's canonical points that page at a different one and asks
+search engines to drop it. A locale you leave blank simply emits no canonical, so whatever your
+application's `Head::defaults()` set — usually a self-referencing canonical — stands.
 
 No `spatie/laravel-translatable` dependency — these are plain `array` casts.
 
@@ -242,6 +247,11 @@ inherits your app-level default rather than being blanked.
 **Can I use it on a model that is not exposed in a resource?**
 Yes — the trait and `applyHead()` work with no panel involved. The Filament section is just the
 editing UI.
+
+**Why is the canonical URL per locale when robots and the image are not?**
+Because it is the only field where a shared value is actively wrong. Robots directives and a
+sharing image are the same whatever language the page is in; a canonical URL is an address, and
+each locale has its own.
 
 **Is the canonical URL forced to HTTPS?**
 No. Stored URLs are passed through with `forceHttps: false`, so an external or plain-`http`

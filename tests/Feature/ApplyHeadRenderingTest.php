@@ -46,7 +46,7 @@ it('falls back per field when only some stored values are filled', function (): 
 
 it('renders an external canonical url unchanged', function (): void {
     $post = makePost();
-    storeMetadata($post, ['canonical_url' => 'http://external.example/x']);
+    storeMetadata($post, ['canonical_url' => ['en' => 'http://external.example/x']]);
 
     expect(renderHead($post))->toContain('<link rel="canonical" href="http://external.example/x">');
 });

@@ -48,3 +48,25 @@ function renderHead(Post $post): string
 {
     return test()->get('/posts/'.$post->getKey())->getContent();
 }
+
+/**
+ * @return array<int, string>
+ */
+function formComponentClasses(object $livewire): array
+{
+    $classes = [];
+
+    $walk = function ($schema) use (&$walk, &$classes): void {
+        foreach ($schema->getComponents(withHidden: true) as $component) {
+            $classes[] = $component::class;
+
+            foreach ($component->getChildSchemas() as $child) {
+                $walk($child);
+            }
+        }
+    };
+
+    $walk($livewire->instance()->getSchema('form'));
+
+    return $classes;
+}

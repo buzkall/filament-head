@@ -7,28 +7,6 @@ use Filament\Schemas\Components\Tabs;
 
 use function Pest\Livewire\livewire;
 
-/**
- * @return array<int, string>
- */
-function formComponentClasses(object $livewire): array
-{
-    $classes = [];
-
-    $walk = function ($schema) use (&$walk, &$classes): void {
-        foreach ($schema->getComponents(withHidden: true) as $component) {
-            $classes[] = $component::class;
-
-            foreach ($component->getChildSchemas() as $child) {
-                $walk($child);
-            }
-        }
-    };
-
-    $walk($livewire->instance()->getSchema('form'));
-
-    return $classes;
-}
-
 it('renders no tabs for a single locale', function (): void {
     $this->actingAs(makeUser());
     $post = makePost();

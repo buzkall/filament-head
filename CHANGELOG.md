@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `->withoutSection()` on `HeadMetadataFields`, rendering the bare fields for containers
+  that already frame and label their contents — a tab, a wizard step, a fieldset.
+- `->heading()` to override the section heading.
+
 ### Changed
 
 - **Breaking.** `canonical_url` is now stored as JSON keyed by locale, like the other text
@@ -16,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking.** Unlike every other translatable field, `canonical_url` does not fall back to
   another locale: a blank one emits no canonical rather than borrowing a wrong address.
   `HeadMetadata::translated()` takes a `$fallback` argument for this.
+- **Breaking.** `HeadMetadataFields` extends `Group` rather than `Section`, so the section is
+  now something it renders rather than something it is. `HeadMetadataFields::make('Heading')`
+  becomes `HeadMetadataFields::make()->heading('Heading')`.
 
 ## [0.1.0]
 

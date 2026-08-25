@@ -95,6 +95,17 @@ It is a collapsible `Section`, full width, that drops in anywhere a form compone
 changes to your Create or Edit page classes are needed** — the fields are bound to the
 `headMetadata` relationship, which Filament persists along with the record.
 
+Inside a tab, a wizard step or anything else that already frames and labels its contents, that
+section is a box in a box. Drop it:
+
+```php
+Tab::make(__('SEO'))
+    ->schema([HeadMetadataFields::make()->withoutSection()]),
+```
+
+`->withoutSection()` renders the bare fields — no heading, no description, no collapse toggle.
+To keep the section but change what it says, use `->heading('Search engines')`.
+
 ### 3. Apply it on the public site
 
 ```php

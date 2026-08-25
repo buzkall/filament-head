@@ -18,12 +18,16 @@ use Laravel\Head\Enums\TwitterCard;
 use LogicException;
 
 /**
- * The whole editing UI, as a single section that drops into any resource form.
+ * The whole editing UI, as one component that drops into any resource form.
+ *
+ * By default it renders as a collapsible Section with its own heading. Inside a tab
+ * — or any container that already labels and frames its contents — call
+ * ->withoutSection() to render the bare fields instead.
  *
  * The fields are wrapped in a Group bound to the `headMetadata` relationship, so
  * Create and Edit pages persist the morphOne without any page-class changes.
  */
-class HeadMetadataFields extends Section
+class HeadMetadataFields extends Group
 {
     /** Columns of head_metadata that ->without() may hide. */
     public const OPTIONAL_FIELDS = [
@@ -51,15 +55,31 @@ class HeadMetadataFields extends Section
     /** @var array<int, string> */
     protected array $hiddenFields = [];
 
-    public static function make(string|array|Htmlable|Closure|null $heading = null): static
-    {
-        /** @var static $static */
-        $static = app(static::class, [
-            'heading' => $heading ?? __('filament-head::filament-head.section.heading'),
-        ]);
-        $static->configure();
+    protected string|Htmlable|Closure|null $heading = null;
 
-        return $static;
+    protected bool $sectioned = true;
+
+    /**
+     * Heading of the wrapping section. Defaults to the packaged one, and is
+     * ignored once ->withoutSection() has run.
+     */
+    public function heading(string|Htmlable|Closure|null $heading): static
+    {
+        $this->heading = $heading;
+
+        return $this;
+    }
+
+    /**
+     * Render the bare fields, with no section heading, description or collapse
+     * toggle. Use it wherever the container already supplies those — a tab, a
+     * wizard step, a fieldset — where a second frame is just a box in a box.
+     */
+    public function withoutSection(bool $condition = true): static
+    {
+        $this->sectioned = ! $condition;
+
+        return $this;
     }
 
     /**
@@ -115,10 +135,8 @@ class HeadMetadataFields extends Section
     {
         parent::setUp();
 
-        $this->description(__('filament-head::filament-head.section.description'))
-            ->collapsible()
-            ->columnSpanFull()
-            // Built lazily, so ->locales() and ->without() have already run.
+        $this->columnSpanFull()
+            // Built lazily, so ->locales(), ->without() and ->withoutSection() have already run.
             ->schema(fn (): array => $this->buildSchema());
     }
 
@@ -127,11 +145,21 @@ class HeadMetadataFields extends Section
      */
     protected function buildSchema(): array
     {
+        $fields = Group::make([
+            ...$this->translatableFields(),
+            ...$this->plainFields(),
+        ])->relationship('headMetadata');
+
+        if (! $this->sectioned) {
+            return [$fields];
+        }
+
         return [
-            Group::make([
-                ...$this->translatableFields(),
-                ...$this->plainFields(),
-            ])->relationship('headMetadata'),
+            Section::make($this->heading ?? __('filament-head::filament-head.section.heading'))
+                ->description(__('filament-head::filament-head.section.description'))
+                ->collapsible()
+                ->columnSpanFull()
+                ->schema([$fields]),
         ];
     }
 

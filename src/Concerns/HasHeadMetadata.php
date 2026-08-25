@@ -56,7 +56,9 @@ trait HasHeadMetadata
         $ogImage = $this->resolveHeadValue($meta?->ogImageUrl(), $defaults->ogImage);
         $ogType = $this->resolveHeadValue($meta?->og_type, $defaults->ogType);
         $twitterCard = $this->resolveHeadValue($meta?->twitter_card, $defaults->twitterCard);
-        $canonicalUrl = $this->resolveHeadValue($meta?->canonical_url, $defaults->canonicalUrl);
+        // No cross-locale fallback: borrowing another locale's canonical would point
+        // this page at that one and drop it from the index.
+        $canonicalUrl = $this->resolveHeadValue($meta?->translated('canonical_url', fallback: false), $defaults->canonicalUrl);
         $robots = $this->resolveHeadValue($meta?->robots, $defaults->robots);
 
         if ($title !== null) {

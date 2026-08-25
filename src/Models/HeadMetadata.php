@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
  * @property string|null $og_image
  * @property string|null $og_type
  * @property string|null $twitter_card
- * @property string|null $canonical_url
+ * @property array<string, string|null>|null $canonical_url
  * @property string|null $robots
  */
 class HeadMetadata extends Model
@@ -47,20 +47,29 @@ class HeadMetadata extends Model
     /**
      * Resolve a translatable column for a locale, falling back to the configured
      * fallback locale and finally to the first non-empty translation.
+     *
+     * Pass $fallback: false for a column where borrowing another locale's value is
+     * wrong rather than merely imperfect — canonical_url, where it would point one
+     * locale's page at another's and de-index it.
      */
-    public function translated(string $column, ?string $locale = null): ?string
+    public function translated(string $column, ?string $locale = null, bool $fallback = true): ?string
     {
         /** @var array<string, string|null> $values */
         $values = $this->{$column} ?? [];
         $locale ??= app()->getLocale();
-        $fallback = config('filament-head.fallback_locale') ?? config('app.fallback_locale');
 
         if (filled($values[$locale] ?? null)) {
             return $values[$locale];
         }
 
-        if (is_string($fallback) && filled($values[$fallback] ?? null)) {
-            return $values[$fallback];
+        if (! $fallback) {
+            return null;
+        }
+
+        $fallbackLocale = config('filament-head.fallback_locale') ?? config('app.fallback_locale');
+
+        if (is_string($fallbackLocale) && filled($values[$fallbackLocale] ?? null)) {
+            return $values[$fallbackLocale];
         }
 
         return collect($values)->first(fn (?string $value): bool => filled($value));
@@ -88,6 +97,7 @@ class HeadMetadata extends Model
             'description' => 'array',
             'og_title' => 'array',
             'og_description' => 'array',
+            'canonical_url' => 'array',
         ];
     }
 }

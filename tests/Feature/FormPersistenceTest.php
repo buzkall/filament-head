@@ -23,7 +23,7 @@ it('exposes the metadata fields under the relationship state path', function ():
         ->assertFormFieldExists('headMetadata.og_image')
         ->assertFormFieldExists('headMetadata.og_type')
         ->assertFormFieldExists('headMetadata.twitter_card')
-        ->assertFormFieldExists('headMetadata.canonical_url')
+        ->assertFormFieldExists('headMetadata.canonical_url.en')
         ->assertFormFieldExists('headMetadata.robots');
 });
 
@@ -68,7 +68,7 @@ it('creates the record and its metadata together', function (): void {
         ->fillForm([
             'title' => 'A new post',
             'headMetadata.title.en' => 'Created',
-            'headMetadata.canonical_url' => 'https://example.com/a-new-post',
+            'headMetadata.canonical_url.en' => 'https://example.com/a-new-post',
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -77,7 +77,7 @@ it('creates the record and its metadata together', function (): void {
 
     expect($post->title)->toBe('A new post')
         ->and($post->headMetadata->title['en'])->toBe('Created')
-        ->and($post->headMetadata->canonical_url)->toBe('https://example.com/a-new-post');
+        ->and($post->headMetadata->canonical_url['en'])->toBe('https://example.com/a-new-post');
 });
 
 it('hides the fields passed to without()', function (): void {
@@ -97,9 +97,9 @@ it('validates the canonical url as a url', function (): void {
     $post = makePost();
 
     livewire(EditPost::class, ['record' => $post->getKey()])
-        ->fillForm(['headMetadata.canonical_url' => 'not a url'])
+        ->fillForm(['headMetadata.canonical_url.en' => 'not a url'])
         ->call('save')
-        ->assertHasFormErrors(['headMetadata.canonical_url']);
+        ->assertHasFormErrors(['headMetadata.canonical_url.en']);
 });
 
 it('renders and applies cleanly when the section is left entirely empty', function (): void {

@@ -109,3 +109,35 @@ it('applies the fallback locale when the active one is missing', function (): vo
 
     expect(renderHead($post))->toContain('<title>Título</title>');
 });
+
+it('applies the canonical url for the active locale', function (): void {
+    $post = makePost();
+    storeMetadata($post, ['canonical_url' => [
+        'es' => 'https://example.com/es/post',
+        'en' => 'https://example.com/en/post',
+    ]]);
+
+    app()->setLocale('en');
+    expect(renderHead($post))->toContain('<link rel="canonical" href="https://example.com/en/post">');
+
+    app()->setLocale('es');
+    expect(renderHead($post->fresh()))->toContain('<link rel="canonical" href="https://example.com/es/post">');
+});
+
+it('never borrows another locale canonical url', function (): void {
+    config()->set('app.fallback_locale', 'es');
+    app()->setLocale('en');
+
+    $post = makePost();
+    storeMetadata($post, [
+        'title' => ['es' => 'Título'],
+        'canonical_url' => ['es' => 'https://example.com/es/post'],
+    ]);
+
+    $html = renderHead($post);
+
+    // the title still falls back, but pointing the English page at the Spanish url
+    // would ask search engines to drop it, so a blank canonical stays blank
+    expect($html)->toContain('<title>Título</title>')
+        ->and($html)->not->toContain('rel="canonical"');
+});

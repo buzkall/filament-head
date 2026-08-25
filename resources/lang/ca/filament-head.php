@@ -3,7 +3,7 @@
 return [
 
     'section' => [
-        'heading' => 'SEO i compartició',
+        'heading' => 'SEO i compartir',
         'description' => 'Substitueix les metadades que fan servir els cercadors i les xarxes socials per a aquest registre.',
     ],
 

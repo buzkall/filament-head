@@ -27,6 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking.** `HeadMetadataFields` extends `Group` rather than `Section`, so the section is
   now something it renders rather than something it is. `HeadMetadataFields::make('Heading')`
   becomes `HeadMetadataFields::make()->heading('Heading')`.
+- The character counters on title and description moved from helper text under the field to a
+  hint on the label row, and turn red past the limit. `Textarea` has no affixes, so a hint is the
+  one placement both fields can share. Both are now `live(debounce: '500ms')` rather than
+  `live(onBlur: true)`, so every dependent hint keeps up with typing.
 
 ## [0.1.0]
 

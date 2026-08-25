@@ -194,13 +194,15 @@ class HeadMetadataFields extends Group
         $fields = [
             'title' => TextInput::make("title.{$locale}")
                 ->label(__('filament-head::filament-head.fields.title'))
-                ->live(onBlur: true)
-                ->helperText(fn (?string $state): string => $this->counter($state, $this->getTitleLimit())),
+                ->live(debounce: '500ms')
+                ->hint(fn (?string $state): string => $this->counter($state, $this->getTitleLimit()))
+                ->hintColor(fn (?string $state): ?string => $this->counterColor($state, $this->getTitleLimit())),
             'description' => Textarea::make("description.{$locale}")
                 ->label(__('filament-head::filament-head.fields.description'))
                 ->rows(2)
-                ->live(onBlur: true)
-                ->helperText(fn (?string $state): string => $this->counter($state, $this->getDescriptionLimit())),
+                ->live(debounce: '500ms')
+                ->hint(fn (?string $state): string => $this->counter($state, $this->getDescriptionLimit()))
+                ->hintColor(fn (?string $state): ?string => $this->counterColor($state, $this->getDescriptionLimit())),
             'og_title' => TextInput::make("og_title.{$locale}")
                 ->label(__('filament-head::filament-head.fields.og_title'))
                 ->helperText(fn (Get $get): string => $this->reuseHint('og_title', $get("title.{$locale}"))),
@@ -281,14 +283,31 @@ class HeadMetadataFields extends Group
 
     /**
      * A hint, never a validation rule: over-length titles still save.
+     *
+     * It rides on the label row rather than under the field because Textarea has no
+     * affixes — only TextInput does — and a counter inside one box but above the
+     * other would read as two different things.
      */
     protected function counter(?string $state, int $limit): string
     {
         $count = mb_strlen((string) $state);
 
-        $key = $count > $limit ? 'counter_over' : 'counter';
+        $key = $this->isOverLimit($state, $limit) ? 'counter_over' : 'counter';
 
         return __("filament-head::filament-head.helpers.{$key}", ['count' => $count, 'limit' => $limit]);
+    }
+
+    /**
+     * Red past the limit, inherited otherwise.
+     */
+    protected function counterColor(?string $state, int $limit): ?string
+    {
+        return $this->isOverLimit($state, $limit) ? 'danger' : null;
+    }
+
+    protected function isOverLimit(?string $state, int $limit): bool
+    {
+        return mb_strlen((string) $state) > $limit;
     }
 
     /**

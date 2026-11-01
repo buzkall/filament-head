@@ -51,7 +51,12 @@ php artisan filament-head:install
 ```
 
 The install command publishes the config file, publishes the migration that creates the
-`head_metadata` table and offers to run it.
+`head_metadata` table and offers to run it. It then goes through every panel provider in your app
+and asks whether to register the [plugin](#the-plugin-optional) there. That step is optional,
+because the plugin only carries per-panel overrides. Answering yes adds
+`->plugin(FilamentHeadPlugin::make())` just before the panel's `->id()` call, along with the
+import. Panels that already register the plugin are skipped. If the provider's `->id()` call
+doesn't start its own line, the command prints the line for you to add by hand.
 
 Your own tables are never touched — every record's metadata lives in one polymorphic table.
 
@@ -347,8 +352,15 @@ sharing image are the same whatever language the page is in; a canonical URL is 
 each locale has its own.
 
 **Is the canonical URL forced to HTTPS?**
-No. Stored URLs are passed through with `forceHttps: false`, so an external or plain-`http`
-canonical is emitted exactly as you typed it.
+Not one typed in the panel. A plain-`http` address entered there is kept as typed, since it may
+belong to another site that is still on `http`. A canonical URL from the model's `headDefaults()`
+follows your `Head::defaults()` instead, and laravel/head turns that into `https` unless you pass
+`forceHttps: false` there. Either way, laravel/head strips a trailing slash from the path.
+
+**Why are the App and Player Twitter cards missing?**
+They need extra `twitter:app:*` or `twitter:player` tags that the form has no fields for, and
+without them X shows no card at all. If you need one, set the card and its tags with `Head::`
+yourself, after `applyHead()`.
 
 ## Testing
 

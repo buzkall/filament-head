@@ -5,7 +5,26 @@ All notable changes to `filament-head` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.1] - 2026-11-01
+
+### Added
+
+- `filament-head:install` asks, for each panel provider in the app, whether to register
+  `FilamentHeadPlugin` there, and adds the plugin call and its import when you answer yes.
+
+### Removed
+
+- `filament-head:install` no longer asks you to star the repository on GitHub.
+- The App and Player Twitter cards are no longer offered in the form. They need tags the form
+  cannot set, so X showed no card. Values already stored keep rendering.
+
+### Fixed
+
+- A sharing image on a record with no title no longer renders empty `og:image:alt` and
+  `twitter:image:alt` tags.
+- A canonical URL from the model's `headDefaults()` now follows the host's `forceHttps` setting,
+  which laravel/head defaults to `https`, instead of always keeping its scheme. An `http://`
+  address typed in the panel is still kept as typed.
 
 ## [0.1.0] - 2026-11-01
 

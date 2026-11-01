@@ -69,7 +69,8 @@ trait HasHeadMetadata
         $twitterCard = $this->resolveHeadValue($meta?->twitter_card, $defaults->twitterCard);
         // No cross-locale fallback: borrowing another locale's canonical would point
         // this page at that one and drop it from the index.
-        $canonicalUrl = $this->resolveHeadValue($meta?->translated('canonical_url', fallback: false), $defaults->canonicalUrl);
+        $storedCanonicalUrl = $meta?->translated('canonical_url', fallback: false);
+        $canonicalUrl = $this->resolveHeadValue($storedCanonicalUrl, $defaults->canonicalUrl);
         $robots = $this->resolveHeadValue($meta?->robots, $defaults->robots);
 
         if ($title !== null) {
@@ -91,7 +92,8 @@ trait HasHeadMetadata
         }
 
         if ($ogImage !== null) {
-            Head::ogImage($ogImage, alt: $title ?? '');
+            // A null alt omits og:image:alt; an empty one would render it blank.
+            Head::ogImage($ogImage, alt: $title);
         }
 
         if ($twitterCard !== null && ($card = TwitterCard::tryFrom($twitterCard)) !== null) {
@@ -99,7 +101,12 @@ trait HasHeadMetadata
         }
 
         if ($canonicalUrl !== null) {
-            Head::canonical($canonicalUrl, forceHttps: false);
+            // An http:// address typed in the panel is kept as typed, since it may be
+            // another site's. Anything else follows the host's forceHttps setting,
+            // which laravel/head defaults to https.
+            $keepScheme = filled($storedCanonicalUrl) && str_starts_with($canonicalUrl, 'http://');
+
+            Head::canonical($canonicalUrl, forceHttps: $keepScheme ? false : null);
         }
 
         if ($robots !== null) {

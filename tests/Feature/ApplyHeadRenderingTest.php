@@ -2,6 +2,7 @@
 
 use Arzcode\FilamentHead\Data\HeadDefaults;
 use Arzcode\FilamentHead\Tests\Fixtures\Models\ArrayDefaultsPost;
+use Arzcode\FilamentHead\Tests\Fixtures\Models\Post;
 
 it('renders the stored title and description', function (): void {
     $post = makePost();
@@ -142,4 +143,29 @@ it('applies the defaults the caller already built', function (): void {
 
     expect($html)->toContain('<title>From the caller</title>')
         ->and($html)->not->toContain('From the model');
+});
+
+it('leaves out the image alt when no title resolves', function (): void {
+    $post = makePost(['title' => '']);
+    storeMetadata($post, ['og_image' => 'head-metadata/cover.png', 'twitter_card' => 'summary_large_image']);
+
+    $html = renderHead($post);
+
+    expect($html)->toContain('property="og:image"')
+        ->and($html)->not->toContain('og:image:alt')
+        ->and($html)->not->toContain('twitter:image:alt');
+});
+
+it('uses the title as the image alt', function (): void {
+    $post = makePost(['title' => 'Cover story']);
+    storeMetadata($post, ['og_image' => 'head-metadata/cover.png']);
+
+    expect(renderHead($post))->toContain('<meta property="og:image:alt" content="Cover story">');
+});
+
+it('normalizes a model default canonical url to https like laravel/head does', function (): void {
+    Post::$extraDefaults = fn (): array => ['canonicalUrl' => 'http://localhost/posts/1'];
+    $post = makePost();
+
+    expect(renderHead($post))->toContain('<link rel="canonical" href="https://localhost/posts/1">');
 });

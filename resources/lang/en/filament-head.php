@@ -55,8 +55,6 @@ return [
     'twitter_cards' => [
         'summary' => 'Summary with a small image',
         'summary_with_large_image' => 'Summary with a large image',
-        'app' => 'App',
-        'player' => 'Player',
     ],
 
     'robots' => [

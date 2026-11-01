@@ -1,0 +1,16 @@
+<?php
+
+namespace {{ namespace }};
+
+use Filament\Panel;
+use Filament\PanelProvider;
+
+class {{ class }} extends PanelProvider
+{
+    public function panel(Panel $panel): Panel
+    {
+        return $panel
+            ->id('{{ id }}')
+            ->path('{{ id }}');
+    }
+}

@@ -339,7 +339,9 @@ class HeadMetadataFields extends Group
     protected function plainFields(): array
     {
         $ogTypes = $this->enumOptions(OgType::cases(), 'og_types');
-        $twitterCards = $this->enumOptions(TwitterCard::cases(), 'twitter_cards');
+        // App and Player cards need twitter:app:* or twitter:player tags this form has
+        // no fields for; without them X shows no card at all.
+        $twitterCards = $this->enumOptions([TwitterCard::Summary, TwitterCard::SummaryWithLargeImage], 'twitter_cards');
         $robots = [
             'all' => __('filament-head::filament-head.robots.all'),
             'noindex, follow' => __('filament-head::filament-head.robots.noindex_follow'),

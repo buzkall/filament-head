@@ -5,6 +5,7 @@ use Arzcode\FilamentHead\Schemas\HeadMetadataFields;
 use Arzcode\FilamentHead\Tests\Fixtures\Models\Post;
 use Arzcode\FilamentHead\Tests\Fixtures\Resources\Pages\CreatePost;
 use Arzcode\FilamentHead\Tests\Fixtures\Resources\Pages\EditPost;
+use Filament\Forms\Components\Select;
 
 use function Pest\Livewire\livewire;
 
@@ -125,4 +126,12 @@ it('accepts every documented optional field', function (): void {
     $fields = HeadMetadataFields::make()->without(HeadMetadataFields::OPTIONAL_FIELDS);
 
     expect($fields)->toBeInstanceOf(HeadMetadataFields::class);
+});
+
+it('offers only the twitter cards it can fill', function (): void {
+    livewire(EditPost::class, ['record' => makePost()->getKey()])
+        ->assertFormFieldExists(
+            'headMetadata.twitter_card',
+            fn (Select $field): bool => array_keys($field->getOptions()) === ['summary', 'summary_large_image'],
+        );
 });

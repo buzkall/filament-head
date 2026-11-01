@@ -55,8 +55,6 @@ return [
     'twitter_cards' => [
         'summary' => 'Resum amb imatge petita',
         'summary_with_large_image' => 'Resum amb imatge gran',
-        'app' => 'Aplicació',
-        'player' => 'Reproductor',
     ],
 
     'robots' => [

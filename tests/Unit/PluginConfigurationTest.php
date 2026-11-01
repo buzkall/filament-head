@@ -2,7 +2,10 @@
 
 use Arzcode\FilamentHead\FilamentHeadPlugin;
 use Arzcode\FilamentHead\Schemas\HeadMetadataFields;
+use Arzcode\FilamentHead\Tests\Fixtures\Models\Post;
 use Filament\Facades\Filament;
+use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Database\Eloquent\Model;
 
 it('returns null for everything it was not given', function (): void {
     $plugin = FilamentHeadPlugin::make();
@@ -54,4 +57,22 @@ it('returns the plugin from for() when the panel registers one', function (): vo
     );
 
     expect(FilamentHeadPlugin::for(Filament::getPanel('admin'))?->getTitleLimit())->toBe(42);
+});
+
+it('hands the default og image closure the record however it asks for it', function (Closure $callback): void {
+    $post = makePost();
+
+    $url = FilamentHeadPlugin::make()->defaultOgImage($callback)->getDefaultOgImage($post);
+
+    expect($url)->toBe("https://example.com/cards/{$post->getKey()}.jpg");
+})->with([
+    'named $record' => fn ($record): string => "https://example.com/cards/{$record->getKey()}.jpg",
+    'named $model' => fn ($model): string => "https://example.com/cards/{$model->getKey()}.jpg",
+    'typed as its class' => fn (Post $post): string => "https://example.com/cards/{$post->getKey()}.jpg",
+    'typed as Model' => fn (Model $m): string => "https://example.com/cards/{$m->getKey()}.jpg",
+    'typed as an interface' => fn (UrlRoutable $r): string => "https://example.com/cards/{$r->getRouteKey()}.jpg",
+]);
+
+it('returns no default og image when none is configured', function (): void {
+    expect(FilamentHeadPlugin::make()->getDefaultOgImage(makePost()))->toBeNull();
 });

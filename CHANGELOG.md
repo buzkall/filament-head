@@ -7,43 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+## [0.1.0] - 2026-11-01
 
-- `->withoutSection()` on `HeadMetadataFields`, rendering the bare fields for containers
-  that already frame and label their contents — a tab, a wizard step, a fieldset.
-- `->heading()` to override the section heading.
-- The Open Graph title and description helpers now name the value they would reuse, quoting this
-  locale's title or meta description instead of only saying that one exists.
-
-### Changed
-
-- **Breaking.** `canonical_url` is now stored as JSON keyed by locale, like the other text
-  fields, and renders inside the locale tabs. On a site that serves each locale from its own
-  URL, one shared canonical pointed every locale at a single page and asked search engines to
-  drop the rest. Existing installs need the column migrated from `string` to `json`.
-- **Breaking.** Unlike every other translatable field, `canonical_url` does not fall back to
-  another locale: a blank one emits no canonical rather than borrowing a wrong address.
-  `HeadMetadata::translated()` takes a `$fallback` argument for this.
-- **Breaking.** `HeadMetadataFields` extends `Group` rather than `Section`, so the section is
-  now something it renders rather than something it is. `HeadMetadataFields::make('Heading')`
-  becomes `HeadMetadataFields::make()->heading('Heading')`.
-- The character counters on title and description moved from helper text under the field to a
-  hint on the label row, and turn red past the limit. `Textarea` has no affixes, so a hint is the
-  one placement both fields can share. Both are now `live(debounce: '500ms')` rather than
-  `live(onBlur: true)`, so every dependent hint keeps up with typing.
-
-## [0.1.0]
+First release.
 
 ### Added
 
-- `HeadMetadataFields` section for Filament 5 resource forms, editing title, meta
-  description, Open Graph title/description/image/type, Twitter card, canonical URL
-  and robots per record.
-- `HasHeadMetadata` trait: a `headMetadata` morphOne, overridable `headDefaults()`
-  fallbacks and a single `applyHead()` call for the public site.
-- Per-locale storage for the four text fields, rendered as tabs when more than one
-  locale is configured, with a locale → fallback locale → first non-empty chain.
-- Optional `FilamentHeadPlugin` for per-panel overrides of the locales, disk,
-  directory and the two length hints.
-- `->without()` to hide any of the optional fields.
-- English, Spanish and Catalan translations.
+- `HasHeadMetadata` trait: a `headMetadata` morphOne, overridable `headDefaults()` fallbacks —
+  a `HeadDefaults` object or a plain array — and a single `applyHead()` call for the public site.
+  It only calls into `laravel/head` for values that are filled, so the host's `Head::defaults()`
+  stay in place. `applyHead()` also takes the record's `HeadDefaults` when the caller has already
+  built them, so they are not computed twice.
+- A blank Open Graph title or description reuses the stored title or meta description before the
+  model's Open Graph default, as the form's hint says.
+- `HeadMetadataFields`, one component for Filament 5 resource forms that edits title, meta
+  description, Open Graph title/description/image/type, Twitter card, canonical URL and robots per
+  record. It is bound to the relationship, so Create and Edit pages need no changes.
+- The section starts collapsed. On Filament 5.8 and later its content is lazily loaded, rendering
+  only once it is opened and scrolled into view. Stored values still load with the form, so saving
+  without opening the section keeps them, and a validation error inside it loads and expands it.
+  Field keys stay `headMetadata.*`. `->collapsed(false)` and `->lazyLoaded(false)` turn either off.
+- `->withoutSection()` renders the bare fields for containers that already frame and label their
+  contents — a tab, a wizard step, a fieldset. `->heading()` overrides the section heading.
+- `->without()` hides any of the optional fields, and throws on title, description or an unknown
+  name.
+- Every field shows what the page uses today as its placeholder: the record's `headDefaults()`,
+  the title and description the Open Graph fields fall back to, and "index, follow" for robots.
+  Select placeholders are marked "(default)". The shared fields — image, type, card, robots —
+  preview their defaults in the site's primary locale (`fallback_locale`, else
+  `app.fallback_locale`) rather than the admin's.
+- The Open Graph title and description hints quote the value they would reuse. The robots hint
+  explains that a blank field keeps the defaults, while any option, "Index and follow links"
+  included, overrides them.
+- Character counters on title and description, on the label row, turning red past the limit.
+  They are hints, never validation, and update as you type.
+- Per-locale storage for title, description, Open Graph title and description, and canonical URL,
+  rendered as tabs when more than one locale is configured. Values fall back from the active
+  locale to the fallback locale to the first non-empty translation — except `canonical_url`, which
+  never borrows another locale's address; `HeadMetadata::translated()` takes a `$fallback`
+  argument for this.
+- Optional `FilamentHeadPlugin` for per-panel overrides of the locales, disk, directory and the two
+  length hints, plus `defaultOgImage()` for a sharing image the application draws itself. The form
+  previews it above the upload. The closure gets the record as `$record`, `$model` or by any class
+  or interface it satisfies, and runs at most once per request. Only `http(s)` and root-relative
+  URLs are previewed.
+- `filament-head:install` publishes the config and the migration, and offers to run it.
+- English, Spanish and Catalan translations, including the content type and Twitter card options.
+  An option this package has not translated yet is labelled by its case name.

@@ -11,7 +11,7 @@ it('renders no tabs for a single locale', function (): void {
     $this->actingAs(makeUser());
     $post = makePost();
 
-    $component = livewire(EditPost::class, ['record' => $post->getKey()])
+    $component = openHeadSection(livewire(EditPost::class, ['record' => $post->getKey()]))
         ->assertFormFieldExists('headMetadata.title.'.app()->getLocale());
 
     expect(formComponentClasses($component))->not->toContain(Tabs::class);
@@ -23,7 +23,7 @@ it('renders a tab per locale and saves every one', function (): void {
 
     $post = makePost();
 
-    $component = livewire(EditPost::class, ['record' => $post->getKey()]);
+    $component = openHeadSection(livewire(EditPost::class, ['record' => $post->getKey()]));
 
     expect(formComponentClasses($component))->toContain(Tabs::class);
 
@@ -46,7 +46,7 @@ it('takes the locales from the plugin when one is registered', function (): void
 
     $post = makePost();
 
-    livewire(EditPost::class, ['record' => $post->getKey()])
+    openHeadSection(livewire(EditPost::class, ['record' => $post->getKey()]))
         ->assertFormFieldExists('headMetadata.title.fr')
         ->assertFormFieldExists('headMetadata.title.de');
 });
@@ -61,7 +61,7 @@ it('lets ->locales() on the component win over the plugin', function (): void {
 
     $post = makePost();
 
-    livewire(EditPost::class, ['record' => $post->getKey()])
+    openHeadSection(livewire(EditPost::class, ['record' => $post->getKey()]))
         ->assertFormFieldExists('headMetadata.title.ca')
         ->assertFormFieldExists('headMetadata.title.en')
         ->assertFormFieldDoesNotExist('headMetadata.title.fr');

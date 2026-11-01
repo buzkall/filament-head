@@ -7,6 +7,7 @@ use Filament\Contracts\Plugin;
 use Filament\Facades\Filament;
 use Filament\Panel;
 use Filament\Support\Concerns\EvaluatesClosures;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Carries panel-level configuration for the form component. Registering it is
@@ -30,6 +31,8 @@ class FilamentHeadPlugin implements Plugin
     protected int|Closure|null $titleLimit = null;
 
     protected int|Closure|null $descriptionLimit = null;
+
+    protected ?Closure $defaultOgImage = null;
 
     public static function make(): static
     {
@@ -116,6 +119,23 @@ class FilamentHeadPlugin implements Plugin
     }
 
     /**
+     * The sharing image a record goes out with when the form leaves it blank,
+     * for an image the application draws itself rather than one the model can
+     * name. The closure receives the record — as `$record`, `$model`, or by any
+     * type it satisfies — and returns an absolute http(s) URL or null. Any other
+     * scheme gets no preview.
+     *
+     * It only feeds the form's preview: applyHead() runs outside any panel, so
+     * the public page must keep setting that image itself.
+     */
+    public function defaultOgImage(Closure $callback): static
+    {
+        $this->defaultOgImage = $callback;
+
+        return $this;
+    }
+
+    /**
      * @return array<int, string>|null
      */
     public function getLocales(): ?array
@@ -152,5 +172,26 @@ class FilamentHeadPlugin implements Plugin
         $limit = $this->evaluate($this->descriptionLimit);
 
         return $limit === null ? null : (int) $limit;
+    }
+
+    /**
+     * The closure may name the record `$record` or `$model`, or type it as its
+     * class, any parent class or any interface it implements.
+     */
+    public function getDefaultOgImage(Model $record): ?string
+    {
+        if ($this->defaultOgImage === null) {
+            return null;
+        }
+
+        $typed = [];
+
+        foreach ([$record::class, ...class_parents($record), ...class_implements($record)] as $type) {
+            $typed[$type] = $record;
+        }
+
+        $url = $this->evaluate($this->defaultOgImage, ['record' => $record, 'model' => $record], $typed);
+
+        return filled($url) ? (string) $url : null;
     }
 }

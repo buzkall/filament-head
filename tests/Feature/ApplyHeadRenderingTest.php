@@ -1,5 +1,6 @@
 <?php
 
+use Arzcode\FilamentHead\Data\HeadDefaults;
 use Arzcode\FilamentHead\Tests\Fixtures\Models\ArrayDefaultsPost;
 
 it('renders the stored title and description', function (): void {
@@ -108,4 +109,37 @@ it('accepts an array of defaults from the model', function (): void {
 
     expect($html)->toContain('<title>From an array</title>')
         ->and($html)->toContain('<meta name="robots" content="nofollow">');
+});
+
+it('reuses a stored title and description for a blank og title and description', function (): void {
+    $post = makePost();
+    storeMetadata($post, [
+        'title' => ['en' => 'Stored title'],
+        'description' => ['en' => 'Stored description'],
+    ]);
+
+    $html = renderHead($post);
+
+    expect($html)->toContain('<meta property="og:title" content="Stored title">')
+        ->and($html)->toContain('<meta property="og:description" content="Stored description">');
+});
+
+it('prefers the stored og title over the stored title', function (): void {
+    $post = makePost();
+    storeMetadata($post, [
+        'title' => ['en' => 'Stored title'],
+        'og_title' => ['en' => 'Og title'],
+    ]);
+
+    expect(renderHead($post))->toContain('<meta property="og:title" content="Og title">');
+});
+
+it('applies the defaults the caller already built', function (): void {
+    $post = makePost(['title' => 'From the model']);
+
+    $post->applyHead(new HeadDefaults(title: 'From the caller'));
+    $html = view('layout')->render();
+
+    expect($html)->toContain('<title>From the caller</title>')
+        ->and($html)->not->toContain('From the model');
 });

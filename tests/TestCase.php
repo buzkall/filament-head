@@ -39,6 +39,7 @@ abstract class TestCase extends Orchestra
         static::$config = [];
         AdminPanelProvider::$configurePlugin = null;
         PostResource::$configureFields = null;
+        Post::$extraDefaults = null;
 
         parent::tearDown();
     }

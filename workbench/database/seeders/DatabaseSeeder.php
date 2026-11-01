@@ -29,10 +29,11 @@ class DatabaseSeeder extends Seeder
                 'en' => 'The profiling that found the bottleneck, the two changes that mattered, and the ones that did not.',
                 'es' => 'El análisis que encontró el cuello de botella y los dos cambios que marcaron la diferencia.',
             ],
-            'og_type' => 'article',
             'twitter_card' => 'summary_large_image',
-            'canonical_url' => 'https://example.com/blog/faster-builds',
-            'robots' => 'all',
+            'canonical_url' => [
+                'en' => 'https://example.com/blog/faster-builds',
+                'es' => 'https://example.com/es/blog/compilaciones-mas-rapidas',
+            ],
         ]);
     }
 }

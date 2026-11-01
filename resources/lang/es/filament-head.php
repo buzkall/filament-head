@@ -4,7 +4,7 @@ return [
 
     'section' => [
         'heading' => 'SEO y compartir',
-        'description' => 'Sustituye los metadatos que usan los buscadores y las redes sociales para este registro.',
+        'description' => 'Sustituye los metadatos que usan los buscadores y las redes sociales para este registro. En gris, lo que se usa ahora: deja el campo en blanco para mantenerlo.',
     ],
 
     'fields' => [
@@ -27,15 +27,40 @@ return [
         'og_description' => 'Déjalo en blanco para reutilizar la meta descripción.',
         'og_description_reusing' => 'Déjalo en blanco para reutilizar la meta descripción: «:value»',
         'og_image' => 'Se muestra al compartir la página. 1200×630 funciona en todas partes.',
+        'og_image_current' => 'La imagen que se comparte ahora',
+        'select_default' => ':value (por defecto)',
         'canonical_url' => 'La dirección bajo la que debe indexarse esta página.',
+        'robots' => 'Déjalo en blanco para mantener el valor por defecto. Elegir una opción siempre lo sustituye, incluso «Indexar y seguir enlaces».',
     ],
 
     'exceptions' => [
         'unknown_field' => 'No se pueden ocultar [:fields] de la sección de metadatos. Solo estos campos son opcionales: :allowed.',
     ],
 
+    'og_types' => [
+        'website' => 'Sitio web',
+        'article' => 'Artículo',
+        'book' => 'Libro',
+        'profile' => 'Perfil',
+        'music_song' => 'Canción',
+        'music_album' => 'Álbum',
+        'music_playlist' => 'Lista de reproducción',
+        'music_radio_station' => 'Emisora de radio',
+        'video_movie' => 'Película',
+        'video_episode' => 'Episodio',
+        'video_tv_show' => 'Serie de televisión',
+        'video_other' => 'Otro vídeo',
+    ],
+
+    'twitter_cards' => [
+        'summary' => 'Resumen con imagen pequeña',
+        'summary_with_large_image' => 'Resumen con imagen grande',
+        'app' => 'Aplicación',
+        'player' => 'Reproductor',
+    ],
+
     'robots' => [
-        'all' => 'Indexar y seguir enlaces (por defecto)',
+        'all' => 'Indexar y seguir enlaces',
         'noindex_follow' => 'No indexar, seguir enlaces',
         'noindex_nofollow' => 'No indexar, no seguir enlaces',
         'nofollow' => 'Indexar, no seguir enlaces',

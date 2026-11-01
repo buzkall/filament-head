@@ -17,6 +17,7 @@ class Post extends Model
         return new HeadDefaults(
             title: $this->title,
             description: str($this->body ?? '')->limit(160)->toString(),
+            ogType: 'article',
         );
     }
 }

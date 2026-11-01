@@ -42,17 +42,28 @@ trait HasHeadMetadata
      *
      * Runtime calls layer on top of the host application's Head::defaults(), and
      * calling a method overrides that one field — so only filled values are sent.
+     *
+     * A blank Open Graph title or description reuses the stored title or meta
+     * description before the model's Open Graph default, as the form promises:
+     * otherwise a title typed in the panel would change <title> while the share
+     * preview kept the derived one, whenever the host had already set og:title.
+     *
+     * @param  HeadDefaults|array<string, string|null>|null  $defaults  the model's
+     *                                                                  headDefaults(), when the caller already built them
      */
-    public function applyHead(): void
+    public function applyHead(HeadDefaults|array|null $defaults = null): void
     {
-        $defaults = HeadDefaults::wrap($this->headDefaults());
+        $defaults = HeadDefaults::wrap($defaults ?? $this->headDefaults());
 
         $meta = $this->headMetadata;
 
-        $title = $this->resolveHeadValue($meta?->translated('title'), $defaults->title);
-        $description = $this->resolveHeadValue($meta?->translated('description'), $defaults->description);
-        $ogTitle = $this->resolveHeadValue($meta?->translated('og_title'), $defaults->ogTitle);
-        $ogDescription = $this->resolveHeadValue($meta?->translated('og_description'), $defaults->ogDescription);
+        $storedTitle = $meta?->translated('title');
+        $storedDescription = $meta?->translated('description');
+
+        $title = $this->resolveHeadValue($storedTitle, $defaults->title);
+        $description = $this->resolveHeadValue($storedDescription, $defaults->description);
+        $ogTitle = $this->resolveHeadValue($meta?->translated('og_title'), $this->resolveHeadValue($storedTitle, $defaults->ogTitle));
+        $ogDescription = $this->resolveHeadValue($meta?->translated('og_description'), $this->resolveHeadValue($storedDescription, $defaults->ogDescription));
         $ogImage = $this->resolveHeadValue($meta?->ogImageUrl(), $defaults->ogImage);
         $ogType = $this->resolveHeadValue($meta?->og_type, $defaults->ogType);
         $twitterCard = $this->resolveHeadValue($meta?->twitter_card, $defaults->twitterCard);

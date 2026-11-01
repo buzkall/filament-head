@@ -22,8 +22,13 @@ Translatable per locale, translated into English, Spanish and Catalan.
 
 | Default — one locale | With `locales` configured |
 |---|---|
-| <img src="art/section.png" alt="The SEO and sharing section open in a Filament resource form, showing title, meta description, Open Graph and robots fields" width="420"> | <img src="art/locale-tabs.png" alt="The same section with a tab per locale above the title and description fields" width="420"> |
-| A collapsible section at the foot of the form, with character counters on title and description. | One tab per locale for the five text fields; image, type, card and robots stay shared. |
+| <img src="art/section.png" alt="The SEO and sharing section opened, showing title and meta description with character counters, Open Graph fields showing the values they reuse as greyed-out placeholders, and selects marked as defaults" width="420"> | <img src="art/locale-tabs.png" alt="The same section with EN and ES tabs around the five translatable fields, and the image, type, card and robots fields shared below them" width="420"> |
+| Greyed out is what the page uses today: the record's defaults, and the title and description the Open Graph fields reuse. Counters sit on the label row. | One tab per locale for the five text fields; image, type, card and robots stay shared. |
+
+<img src="art/collapsed.png" alt="An Edit Post form with title and body fields and the SEO and sharing section collapsed beneath them" width="560">
+
+The section sits at the foot of the form, collapsed — and on Filament 5.8+ its fields aren't even
+rendered until it is opened. See [lazy loading](#lazy-loading).
 
 ---
 
@@ -33,7 +38,7 @@ Translatable per locale, translated into English, Spanish and Catalan.
 |---|---|
 | PHP | 8.3+ |
 | Laravel | 13.17+ |
-| Filament | 5 |
+| Filament | 5 (5.8+ for [lazy loading](#lazy-loading)) |
 | `laravel/head` | 0.2 |
 
 Laravel 13.17 is the floor because that is what `laravel/head` itself requires.
@@ -95,6 +100,10 @@ It is a collapsible `Section`, full width, that drops in anywhere a form compone
 changes to your Create or Edit page classes are needed** — the fields are bound to the
 `headMetadata` relationship, which Filament persists along with the record.
 
+The section starts **collapsed**: the metadata overrides something most records never need. Use
+`->collapsed(false)` to start it open. On Filament 5.8 and later its content is also
+[lazily loaded](#lazy-loading), so a closed section costs the edit page next to nothing.
+
 Inside a tab, a wizard step or anything else that already frames and labels its contents, that
 section is a box in a box. Drop it:
 
@@ -104,6 +113,7 @@ Tab::make(__('SEO'))
 ```
 
 `->withoutSection()` renders the bare fields — no heading, no description, no collapse toggle.
+They always render open and with the page: `->collapsed()` and lazy loading need the section.
 To keep the section but change what it says, use `->heading('Search engines')`.
 
 ### 3. Apply it on the public site
@@ -150,6 +160,19 @@ public function headDefaults(): array
 }
 ```
 
+The form shows these defaults as the fields' placeholders, so an admin sees what the page uses
+before overriding it. A blank Open Graph title or description shows the title or meta description
+it falls back to, and a blank robots field shows "index, follow".
+
+The fields stored once — image, type, card, robots — preview their defaults in the site's primary
+locale: `fallback_locale`, else `app.fallback_locale`, when the form offers it, else the first
+locale it offers. An admin browsing the panel in another language still sees what the main site
+shares.
+
+A blank robots field and the "Index and follow links" option look alike but are not the same: blank
+keeps the record's and the site's defaults, while choosing any option, that one included, always
+overrides them. The field's hint says so.
+
 Resolution is **per field**: a stored value wins, a blank stored value falls through to the
 default, and a field with neither is not emitted at all.
 
@@ -191,6 +214,53 @@ Any of `og_title`, `og_description`, `og_image`, `og_type`, `twitter_card`, `can
 `robots` can be hidden. Title and description always render — passing either of them, or a name
 that is not a field, throws a `LogicException` rather than quietly dropping the input.
 
+## Lazy loading
+
+Filament 5.8 added
+[lazily loaded child schemas](https://filamentphp.com/docs/5.x/schemas/sections#lazy-loading-section-content):
+a section's header renders with the page, and its content only once the section is expanded and
+scrolled into view, in a request of its own. This package turns that on by default, because the
+section is collapsed by default and its content is the expensive part of the form — every
+placeholder runs your `headDefaults()` once per locale, and the image preview may run a
+`defaultOgImage()` closure that draws a card.
+
+What that means in practice:
+
+- **Nothing is lost by not opening it.** Only the rendering is deferred. The stored values load with
+  the form, so saving the record without ever opening the section writes them back unchanged.
+- **Validation errors are not hidden.** If a field inside the section fails validation — say a
+  stored canonical URL that is not a URL — Filament loads the content and expands the section to show
+  the error.
+- **It loads once.** After the first opening the content stays loaded for the life of the page.
+- **Field names don't change.** The fields keep their usual state paths and keys, such as
+  `headMetadata.title.en`, so `fillForm()` and `assertFormFieldExists()` work as before.
+
+To render the fields with the page instead — for instance, if your browser tests read them without
+opening the section — turn it off:
+
+```php
+HeadMetadataFields::make()->lazyLoaded(false)
+```
+
+It never applies to `->withoutSection()`, and on Filament versions before 5.8 the fields simply
+render with the page. `HeadMetadataFields::supportsLazyLoading()` tells you which you have.
+
+**Testing your own forms.** A Livewire test only sees what has been rendered, so assertions on the
+section's HTML — a placeholder, a hint — need the content loaded first:
+
+```php
+livewire(EditPost::class, ['record' => $post->getKey()])
+    ->call('loadDeferredSchema', 'form.headMetadata')
+    ->call('$refresh') // the load answers with a partial render; this renders the page with it
+    ->assertSeeHtml('placeholder="My post"');
+```
+
+**Keys.** Every lazy schema needs a key that is unique on the page. The section uses the
+relationship's name, `headMetadata`, which is unique by nature: a second set of these fields on the
+same form would write to the same relationship. Inside a repeater or builder, Filament prefixes it
+with the item's key, and separate relation managers are separate Livewire components, so neither
+collides.
+
 ## Configuration
 
 `config/filament-head.php`:
@@ -220,6 +290,7 @@ $panel->plugin(
         ->directory('seo')
         ->titleLimit(55)
         ->descriptionLimit(150)
+        ->defaultOgImage(fn (Post $record): ?string => $record->share_card_url)
 );
 ```
 
@@ -230,6 +301,17 @@ $panel->plugin(
 | `directory(string\|Closure)` | `directory` |
 | `titleLimit(int\|Closure)` | `title_limit` |
 | `descriptionLimit(int\|Closure)` | `description_limit` |
+
+`defaultOgImage()` has no config key. It is for a sharing image the application draws or stores
+itself, which the model's `headDefaults()` cannot name. The form shows it as a preview above the
+upload, only when the model's own `ogImage` default is blank. Like the rest of the plugin,
+`applyHead()` never reads it, so the public page has to keep setting that image itself.
+
+The closure gets the record as `$record` or `$model`, or by any type it satisfies: its class, a
+parent class such as `Model`, or an interface it implements. It runs at most once per request, and
+only once the section is open. Return an `http(s)` or root-relative URL. Anything else, such as a
+`javascript:` or `data:` URL, gets no preview, because escaping alone does not make that kind of
+link safe.
 
 Precedence, highest first: `HeadMetadataFields::make()->locales(...)` → the plugin → the config
 file.

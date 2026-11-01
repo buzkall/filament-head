@@ -66,3 +66,24 @@ it('still saves the metadata with no section around the fields', function (): vo
     expect($post->refresh()->headMetadata->translated('title'))->toBe('Sectionless')
         ->and($post->headMetadata->robots)->toBe('noindex, follow');
 });
+
+it('starts the section collapsed', function (): void {
+    $this->actingAs(makeUser());
+
+    $component = livewire(EditPost::class, ['record' => makePost()->getKey()]);
+
+    expect(headMetadataSection($component)->isCollapsed())->toBeTrue();
+});
+
+it('starts the section open for collapsed(false)', function (): void {
+    $this->rebootWith(
+        configureFields: fn (HeadMetadataFields $fields): HeadMetadataFields => $fields->collapsed(false),
+    );
+    $this->actingAs(makeUser());
+
+    $component = livewire(EditPost::class, ['record' => makePost()->getKey()]);
+
+    expect(headMetadataSection($component))
+        ->isCollapsed()->toBeFalse()
+        ->isCollapsible()->toBeTrue();
+});

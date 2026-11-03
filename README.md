@@ -36,7 +36,7 @@ rendered until it is opened. See [lazy loading](#lazy-loading).
 
 | | |
 |---|---|
-| PHP | 8.3+ |
+| PHP | 8.4+ |
 | Laravel | 13.17+ |
 | Filament | 5 (5.8+ for [lazy loading](#lazy-loading)) |
 | `laravel/head` | 0.2 |

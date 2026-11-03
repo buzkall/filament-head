@@ -31,7 +31,7 @@ Copy and adapt (rename `magic-login` → `head` everywhere):
 - `src/MagicLoginPlugin.php` — the `Plugin` contract + `EvaluatesClosures` fluent-config pattern
 - README structure and the `art/` screenshot convention; `resources/lang/{en,es,ca}` translations
 
-Follow the author's code style: PHP 8.3+, constructor promotion, explicit return types, PHPDoc
+Follow the author's code style: PHP 8.4+, constructor promotion, explicit return types, PHPDoc
 over inline comments, `new Foo` without parens when argument-less, curly braces always.
 
 ## Dependency facts (verified)
@@ -39,7 +39,7 @@ over inline comments, `new Foo` without parens when argument-less, curly braces 
 - `laravel/head` is at **v0.2.1** and requires `illuminate/*: ^13.17` → this package supports
   **Laravel 13.17+ only**. Pin `"laravel/head": "^0.2"` — it is pre-1.0, so isolate every call
   to its API inside `HasHeadMetadata::applyHead()` (one coupling point).
-- `composer.json` require: `php: ^8.3`, `filament/filament: ^5.0`, `laravel/head: ^0.2`,
+- `composer.json` require: `php: ^8.4`, `filament/filament: ^5.0`, `laravel/head: ^0.2`,
   `illuminate/contracts: ^13.17`, `spatie/laravel-package-tools: ^1.92`.
 - require-dev: same list as magic-login (pest ^5, testbench `^11.0`, larastan ^3, pint,
   pest-plugin-livewire ^5, phpstan extension-installer + plugins). Testbench must be a version

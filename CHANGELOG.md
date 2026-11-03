@@ -5,6 +5,14 @@ All notable changes to `filament-head` will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-11-03
+
+### Removed
+
+- PHP 8.3 support. The package now requires PHP 8.4 or later. 0.1.1 still allowed PHP 8.3 but
+  already used `new` expressions without parentheses, which only PHP 8.4 parses, so it failed
+  with a syntax error on PHP 8.3.
+
 ## [0.1.1] - 2026-11-01
 
 ### Added
